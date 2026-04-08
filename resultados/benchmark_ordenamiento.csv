@@ -1,0 +1,14 @@
+algoritmo,tamano,tiempo_ms,lenguaje
+HeapSort,10k,63.28,Python
+MergeSort,10k,56.56,Python
+CocktailSort,10k,8343.63,Python
+DualPivotQuickSort,10k,18.32,Python
+RadixSort,10k,48.26,Python
+HeapSort,100k,795.11,Python
+MergeSort,100k,675.97,Python
+DualPivotQuickSort,100k,591.48,Python
+RadixSort,100k,1469.19,Python
+HeapSort,1m,26128.31,Python
+MergeSort,1m,20066.92,Python
+DualPivotQuickSort,1m,11729.46,Python
+RadixSort,1m,25318.34,Python

@@ -1,0 +1,65 @@
+﻿TALLER DE ORDENAMIENTO Y BÚSQUEDA
+
+
+El objetivo de este taller es investigar, analizar y comparar el desempeño de diferentes algoritmos de ordenamiento y búsqueda, verificando que los resultados experimentales se correspondan con sus complejidades teóricas.
+ 
+Punto 1. Análisis de Algoritmos de Ordenamiento
+Se solicita registrar el tiempo de ejecución y el orden de complejidad teórica de los siguientes algoritmos de ordenamiento:
+* Shaker Sort
+* Dual-Pivot QuickSort
+* Heap Sort
+* Merge Sort
+* Radix Sort
+Cada algoritmo deberá probarse con tres tamaños de arreglo diferentes:
+* 10.000 elementos
+* 100.000 elementos
+* 1.000.000 elementos
+Cada valor del arreglo debe ser un número aleatorio de 8 dígitos, generado de forma automática y cargado desde un archivo de texto plano. Durante las pruebas, se debe medir únicamente el tiempo de ejecución del algoritmo de ordenamiento, excluyendo los tiempos de lectura o escritura de archivos.
+Los resultados obtenidos deberán almacenarse y visualizarse en un gráfico de barras comparativo. Este gráfico debe mostrar una barra por lenguaje de programación (dos barras por algoritmo) y los valores de tiempo visibles sobre cada barra, para facilitar la interpretación.
+Requisitos de Implementación
+* Desarrolle cada algoritmo en dos lenguajes de programación:
+   * Uno compilado (por ejemplo: Java, C++, Go).
+   * Uno interpretado (por ejemplo: Python, JavaScript).
+* Los datos de prueba deben generarse aleatoriamente solo una vez y guardarse en un archivo de texto plano.
+   * En posteriores ejecuciones, el programa debe leer los datos desde el archivo, evitando regenerarlos.
+   * Esto garantiza que todos los algoritmos se evalúen con el mismo conjunto de datos.
+* Los resultados obtenidos deben almacenarse y poder exportarse en formato CSV o JSON para su análisis posterior.
+* Incluya una breve explicación sobre las posibles diferencias en desempeño entre las implementaciones en lenguajes compilados e interpretados.
+* Cite las fuentes utilizadas para cada algoritmo. Se recomienda utilizar GeeksforGeeks como referencia principal y se espera que se use la misma implementación en ambos lenguajes.
+________________
+
+
+ 
+Punto 2. Análisis de Algoritmos de Búsqueda
+Se solicita repetir el procedimiento anterior, pero ahora implementando y evaluando algoritmos de búsqueda. Los arreglos deben contener números enteros de 8 dígitos, y los tiempos deben medirse únicamente durante la ejecución del algoritmo de búsqueda, excluyendo los tiempos de lectura o escritura de archivos.
+Los algoritmos a implementar y analizar son los siguientes:
+* Búsqueda Binaria
+* Búsqueda Ternaria
+* Búsqueda por Saltos (Jump Search)
+Cada algoritmo deberá probarse con tres tamaños de arreglo diferentes:
+* 10.000 elementos
+* 100.000 elementos
+* 1.000.000 elementos
+Los resultados deberán presentarse y almacenarse del mismo modo que en el punto anterior, generando un gráfico de barras comparativo que muestre el tiempo de ejecución en ambos lenguajes de programación y los valores visibles sobre cada barra.
+Asimismo, los requisitos de implementación, formatos de exportación y criterios de análisis serán idénticos a los del apartado anterior, incluyendo la comparación entre lenguajes compilados e interpretados y la citación de las fuentes utilizadas (por ejemplo, GeeksforGeeks).
+________________
+
+
+
+
+Punto 3. Análisis de Casos Específicos
+
+
+Dados los siguientes problemas, realice una explicación del algoritmo y una explicación del tiempo de ejecución T(n).
+ 
+1. https://www.geeksforgeeks.org/sort-n-numbers-range-0-n2-1-linear-time/
+2. https://www.geeksforgeeks.org/sort-array-according-order-defined-another-array/
+3. https://www.geeksforgeeks.org/sort-a-linked-list-of-0s-1s-or-2s/
+ 
+________________
+
+
+
+
+Entrega:
+Se deberá entregar un único documento en formato PDF que contenga el desarrollo completo de los tres puntos del trabajo, mientras que el código fuente correspondiente deberá publicarse en un repositorio de GitHub debidamente organizado y accesible. La entrega será realizada por una sola persona en representación del grupo, aunque la sustentación será grupal y de carácter obligatorio para la calificación final.

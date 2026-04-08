@@ -1,0 +1,80 @@
+[
+  {
+    "algoritmo": "HeapSort",
+    "tamano": "10k",
+    "tiempo_ms": 63.28,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "MergeSort",
+    "tamano": "10k",
+    "tiempo_ms": 56.56,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "CocktailSort",
+    "tamano": "10k",
+    "tiempo_ms": 8343.63,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "DualPivotQuickSort",
+    "tamano": "10k",
+    "tiempo_ms": 18.32,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "RadixSort",
+    "tamano": "10k",
+    "tiempo_ms": 48.26,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "HeapSort",
+    "tamano": "100k",
+    "tiempo_ms": 795.11,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "MergeSort",
+    "tamano": "100k",
+    "tiempo_ms": 675.97,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "DualPivotQuickSort",
+    "tamano": "100k",
+    "tiempo_ms": 591.48,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "RadixSort",
+    "tamano": "100k",
+    "tiempo_ms": 1469.19,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "HeapSort",
+    "tamano": "1m",
+    "tiempo_ms": 26128.31,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "MergeSort",
+    "tamano": "1m",
+    "tiempo_ms": 20066.92,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "DualPivotQuickSort",
+    "tamano": "1m",
+    "tiempo_ms": 11729.46,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "RadixSort",
+    "tamano": "1m",
+    "tiempo_ms": 25318.34,
+    "lenguaje": "Python"
+  }
+]
