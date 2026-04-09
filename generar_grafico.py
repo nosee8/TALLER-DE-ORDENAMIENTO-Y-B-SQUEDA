@@ -20,6 +20,9 @@ except ImportError:
 import pandas as pd
 import numpy as np
 
+# Timeout de 5 minutos = 300 segundos = 300,000 ms
+TIMEOUT_MS = 300000
+
 
 def cargar_resultados():
     """Carga los resultados desde archivos JSON."""
@@ -91,8 +94,9 @@ def crear_grafico(df):
             py_time = row[row['lenguaje'] == 'Python']['tiempo_ms'].values
             java_time = row[row['lenguaje'] == 'Java']['tiempo_ms'].values
             
-            tiempos_python.append(py_time[0] if len(py_time) > 0 else 0)
-            tiempos_java.append(java_time[0] if len(java_time) > 0 else 0)
+            # Si no hay valor, usar el timeout (5 min = 300,000 ms)
+            tiempos_python.append(py_time[0] if len(py_time) > 0 else TIMEOUT_MS)
+            tiempos_java.append(java_time[0] if len(java_time) > 0 else TIMEOUT_MS)
         
         # Crear barras
         bars1 = ax.bar(x - width/2, tiempos_python, width, label='Python', 
@@ -103,13 +107,15 @@ def crear_grafico(df):
         # Agregar valores sobre las barras
         for bar, val in zip(bars1, tiempos_python):
             if val > 0:
+                label = f'{val:.0f}' if val < TIMEOUT_MS else 'TO'
                 ax.text(bar.get_x() + bar.get_width()/2, bar.get_height(), 
-                       f'{val:.1f}', ha='center', va='bottom', fontsize=8, fontweight='bold')
+                       label, ha='center', va='bottom', fontsize=8, fontweight='bold')
         
         for bar, val in zip(bars2, tiempos_java):
             if val > 0:
+                label = f'{val:.0f}' if val < TIMEOUT_MS else 'TO'
                 ax.text(bar.get_x() + bar.get_width()/2, bar.get_height(), 
-                       f'{val:.1f}', ha='center', va='bottom', fontsize=8, fontweight='bold')
+                       label, ha='center', va='bottom', fontsize=8, fontweight='bold')
         
         ax.set_xlabel('Algoritmo', fontsize=10)
         ax.set_ylabel('Tiempo (ms)', fontsize=10)

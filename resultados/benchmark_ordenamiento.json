@@ -2,79 +2,79 @@
   {
     "algoritmo": "HeapSort",
     "tamano": "10k",
-    "tiempo_ms": 63.28,
+    "tiempo_ms": 61.42,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "MergeSort",
     "tamano": "10k",
-    "tiempo_ms": 56.56,
+    "tiempo_ms": 62.0,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "CocktailSort",
     "tamano": "10k",
-    "tiempo_ms": 8343.63,
+    "tiempo_ms": 8979.81,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "DualPivotQuickSort",
     "tamano": "10k",
-    "tiempo_ms": 18.32,
+    "tiempo_ms": 18.67,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "RadixSort",
     "tamano": "10k",
-    "tiempo_ms": 48.26,
+    "tiempo_ms": 45.98,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "HeapSort",
     "tamano": "100k",
-    "tiempo_ms": 795.11,
+    "tiempo_ms": 792.29,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "MergeSort",
     "tamano": "100k",
-    "tiempo_ms": 675.97,
+    "tiempo_ms": 618.32,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "DualPivotQuickSort",
     "tamano": "100k",
-    "tiempo_ms": 591.48,
+    "tiempo_ms": 777.86,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "RadixSort",
     "tamano": "100k",
-    "tiempo_ms": 1469.19,
+    "tiempo_ms": 1523.55,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "HeapSort",
     "tamano": "1m",
-    "tiempo_ms": 26128.31,
+    "tiempo_ms": 27386.63,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "MergeSort",
     "tamano": "1m",
-    "tiempo_ms": 20066.92,
+    "tiempo_ms": 18831.21,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "DualPivotQuickSort",
     "tamano": "1m",
-    "tiempo_ms": 11729.46,
+    "tiempo_ms": 11328.9,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "RadixSort",
     "tamano": "1m",
-    "tiempo_ms": 25318.34,
+    "tiempo_ms": 23110.23,
     "lenguaje": "Python"
   }
 ]

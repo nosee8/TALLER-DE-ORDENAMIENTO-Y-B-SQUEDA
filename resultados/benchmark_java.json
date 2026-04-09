@@ -1,0 +1,86 @@
+[
+  {
+    "algoritmo": "HeapSort",
+    "tamano": "10k",
+    "tiempo_ms": 5.54,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "MergeSort",
+    "tamano": "10k",
+    "tiempo_ms": 6.17,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "RadixSort",
+    "tamano": "10k",
+    "tiempo_ms": 11.18,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "DualPivotQuickSort",
+    "tamano": "10k",
+    "tiempo_ms": 5.92,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "CocktailSort",
+    "tamano": "10k",
+    "tiempo_ms": 205.21,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "HeapSort",
+    "tamano": "100k",
+    "tiempo_ms": 26.83,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "MergeSort",
+    "tamano": "100k",
+    "tiempo_ms": 34.74,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "RadixSort",
+    "tamano": "100k",
+    "tiempo_ms": 39.26,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "DualPivotQuickSort",
+    "tamano": "100k",
+    "tiempo_ms": 14.35,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "CocktailSort",
+    "tamano": "100k",
+    "tiempo_ms": 17321.48,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "HeapSort",
+    "tamano": "1m",
+    "tiempo_ms": 427.66,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "MergeSort",
+    "tamano": "1m",
+    "tiempo_ms": 372.13,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "RadixSort",
+    "tamano": "1m",
+    "tiempo_ms": 301.72,
+    "lenguaje": "Java"
+  },
+  {
+    "algoritmo": "DualPivotQuickSort",
+    "tamano": "1m",
+    "tiempo_ms": 168.71,
+    "lenguaje": "Java"
+  }
+]

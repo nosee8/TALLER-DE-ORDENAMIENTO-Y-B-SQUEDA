@@ -13,9 +13,15 @@
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.text.DecimalFormat;
 
 public class BenchmarkJava {
+    
+    // Timeout de 5 minutos (300 segundos) por algoritmo
+    private static final long TIMEOUT_SECONDS = 300;
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     
     // ==================== ALGORITMOS DE ORDENAMIENTO ====================
     
@@ -229,11 +235,25 @@ public class BenchmarkJava {
         return arr;
     }
 
-    static double medirTiempo(Runnable algoritmo) {
-        long start = System.nanoTime();
-        algoritmo.run();
-        long end = System.nanoTime();
-        return (end - start) / 1_000_000.0; // milisegundos
+    // Método para medir con timeout (devuelve tiempo o -1 si timeout)
+    static double medirTiempoConTimeout(Runnable algoritmo, String nombreAlgo) {
+        Future<Double> future = executor.submit(() -> {
+            long start = System.nanoTime();
+            algoritmo.run();
+            long end = System.nanoTime();
+            return (end - start) / 1_000_000.0;
+        });
+        
+        try {
+            return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            System.out.println("  ⚠️ " + nombreAlgo + ": EXCEDIÓ " + TIMEOUT_SECONDS + "s - demasiadas iteraciones!");
+            return -1;
+        } catch (Exception e) {
+            System.out.println("  ❌ " + nombreAlgo + ": Error - " + e.getMessage());
+            return -2;
+        }
     }
 
     public static void main(String[] args) throws IOException {
@@ -259,29 +279,44 @@ public class BenchmarkJava {
             System.out.println("Datos cargados: " + datos.length + " elementos");
 
             // HeapSort
-            double tiempo = medirTiempo(() -> heapSort(copiarArreglo(datos)));
-            System.out.println("  HeapSort: " + String.format("%.2f", tiempo) + " ms");
-            resultados.add(new String[]{"HeapSort", tamanoNombre, String.format("%.2f", tiempo), "Java"});
+            double tiempo = medirTiempoConTimeout(() -> heapSort(copiarArreglo(datos)), "HeapSort");
+            if (tiempo > 0) {
+                String tiempoStr = String.format(Locale.US, "%.2f", tiempo);
+                System.out.println("  HeapSort: " + tiempoStr + " ms");
+                resultados.add(new String[]{"HeapSort", tamanoNombre, tiempoStr, "Java"});
+            }
 
             // MergeSort
-            tiempo = medirTiempo(() -> mergeSort(copiarArreglo(datos), 0, datos.length - 1));
-            System.out.println("  MergeSort: " + String.format("%.2f", tiempo) + " ms");
-            resultados.add(new String[]{"MergeSort", tamanoNombre, String.format("%.2f", tiempo), "Java"});
+            tiempo = medirTiempoConTimeout(() -> mergeSort(copiarArreglo(datos), 0, datos.length - 1), "MergeSort");
+            if (tiempo > 0) {
+                String tiempoStr = String.format(Locale.US, "%.2f", tiempo);
+                System.out.println("  MergeSort: " + tiempoStr + " ms");
+                resultados.add(new String[]{"MergeSort", tamanoNombre, tiempoStr, "Java"});
+            }
 
             // RadixSort
-            tiempo = medirTiempo(() -> radixSort(copiarArreglo(datos)));
-            System.out.println("  RadixSort: " + String.format("%.2f", tiempo) + " ms");
-            resultados.add(new String[]{"RadixSort", tamanoNombre, String.format("%.2f", tiempo), "Java"});
+            tiempo = medirTiempoConTimeout(() -> radixSort(copiarArreglo(datos)), "RadixSort");
+            if (tiempo > 0) {
+                String tiempoStr = String.format(Locale.US, "%.2f", tiempo);
+                System.out.println("  RadixSort: " + tiempoStr + " ms");
+                resultados.add(new String[]{"RadixSort", tamanoNombre, tiempoStr, "Java"});
+            }
 
             // DualPivotQuickSort
-            tiempo = medirTiempo(() -> dualPivotQuickSort(copiarArreglo(datos), 0, datos.length - 1));
-            System.out.println("  DualPivotQuickSort: " + String.format("%.2f", tiempo) + " ms");
-            resultados.add(new String[]{"DualPivotQuickSort", tamanoNombre, String.format("%.2f", tiempo), "Java"});
+            tiempo = medirTiempoConTimeout(() -> dualPivotQuickSort(copiarArreglo(datos), 0, datos.length - 1), "DualPivotQuickSort");
+            if (tiempo > 0) {
+                String tiempoStr = String.format(Locale.US, "%.2f", tiempo);
+                System.out.println("  DualPivotQuickSort: " + tiempoStr + " ms");
+                resultados.add(new String[]{"DualPivotQuickSort", tamanoNombre, tiempoStr, "Java"});
+            }
 
             // CocktailSort
-            tiempo = medirTiempo(() -> cocktailSort(copiarArreglo(datos)));
-            System.out.println("  CocktailSort: " + String.format("%.2f", tiempo) + " ms");
-            resultados.add(new String[]{"CocktailSort", tamanoNombre, String.format("%.2f", tiempo), "Java"});
+            tiempo = medirTiempoConTimeout(() -> cocktailSort(copiarArreglo(datos)), "CocktailSort");
+            if (tiempo > 0) {
+                String tiempoStr = String.format(Locale.US, "%.2f", tiempo);
+                System.out.println("  CocktailSort: " + tiempoStr + " ms");
+                resultados.add(new String[]{"CocktailSort", tamanoNombre, tiempoStr, "Java"});
+            }
         }
 
         // Exportar a CSV
@@ -308,5 +343,8 @@ public class BenchmarkJava {
         System.out.println("JSON exportado: resultados/benchmark_java.json");
 
         System.out.println("\n=== Benchmark completado ===");
+        
+        // Cerrar el executor
+        executor.shutdown();
     }
 }

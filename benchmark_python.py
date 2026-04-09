@@ -20,8 +20,8 @@ from cocktail_sort import cocktailSort
 from dual_pivot_sort import dualPivotQuickSort
 from radix_sort import radixSort
 
-# Timeout de 1 minuto (60 segundos) por algoritmo
-TIMEOUT_SECONDS = 60
+# Timeout de 5 minutos (300 segundos) por algoritmo
+TIMEOUT_SECONDS = 300
 
 def cargar_datos(archivo):
     """Carga datos desde archivo de texto."""
