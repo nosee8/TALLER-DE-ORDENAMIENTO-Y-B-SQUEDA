@@ -1,13 +1,14 @@
 /**
- * Benchmark para algoritmos de ordenamiento en Java.
+ * Benchmark para algoritmos de búsqueda en Java.
  * Mide el tiempo de ejecución y exporta resultados a CSV/JSON.
  *
+ * El arreglo se ordena previamente (sin medir ese tiempo).
+ * El objetivo de búsqueda es el elemento central del arreglo ordenado.
+ *
  * Referencias:
- * - HeapSort:          https://www.geeksforgeeks.org/heap-sort/
- * - MergeSort:         https://www.geeksforgeeks.org/merge-sort/
- * - RadixSort:         https://www.geeksforgeeks.org/radix-sort/
- * - DualPivotQuickSort: https://www.geeksforgeeks.org/dual-pivot-quicksort/
- * - CocktailSort:      https://www.geeksforgeeks.org/cocktail-sort/
+ * - BinarySearch:  https://www.geeksforgeeks.org/binary-search/
+ * - TernarySearch: https://www.geeksforgeeks.org/ternary-search/
+ * - JumpSearch:    https://www.geeksforgeeks.org/jump-search/
  */
 
 import java.io.*;
@@ -17,9 +18,9 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import utilsJava.*;
 
-public class BenchmarkJava {
+public class BenchmarkBusquedaJava {
 
-    private static final long TIMEOUT_SECONDS = 300;
+    private static final long TIMEOUT_SECONDS = 60;
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     static int[] cargarDatos(String archivo) throws IOException {
@@ -32,10 +33,6 @@ public class BenchmarkJava {
         for (int i = 0; i < datos.size(); i++)
             arr[i] = datos.get(i);
         return arr;
-    }
-
-    static int[] copiar(int[] arr) {
-        return Arrays.copyOf(arr, arr.length);
     }
 
     static double medirTiempo(Runnable algoritmo, String nombre) {
@@ -59,7 +56,7 @@ public class BenchmarkJava {
 
     public static void main(String[] args) throws IOException {
         System.out.println("============================================================");
-        System.out.println("BENCHMARK ALGORITMOS DE ORDENAMIENTO - JAVA");
+        System.out.println("BENCHMARK ALGORITMOS DE BÚSQUEDA - JAVA");
         System.out.println("============================================================");
 
         Map<String, String> tamanos = new LinkedHashMap<>();
@@ -72,28 +69,29 @@ public class BenchmarkJava {
 
         for (Map.Entry<String, String> entry : tamanos.entrySet()) {
             String tamano = entry.getKey();
+
+            // Cargar y ordenar (el tiempo de ordenamiento NO se mide)
             int[] datos = cargarDatos(entry.getValue());
+            Arrays.sort(datos);
             System.out.println("\n=== " + tamano + " elementos ===");
-            System.out.println("Datos cargados: " + datos.length);
+            System.out.println("Datos cargados y ordenados: " + datos.length);
 
-            registrar(resultados, tamano, "HeapSort",
-                medirTiempo(() -> HeapSort.heapSort(copiar(datos)), "HeapSort"));
+            // Objetivo: elemento central (garantizado que existe)
+            final int objetivo = datos[datos.length / 2];
+            System.out.println("Objetivo de búsqueda: " + objetivo);
 
-            registrar(resultados, tamano, "MergeSort",
-                medirTiempo(() -> MergeSort.mergeSort(copiar(datos), 0, datos.length - 1), "MergeSort"));
+            registrar(resultados, tamano, "BinarySearch",
+                medirTiempo(() -> BinarySearch.binarySearch(datos, objetivo), "BinarySearch"));
 
-            registrar(resultados, tamano, "RadixSort",
-                medirTiempo(() -> RadixSort.radixSort(copiar(datos)), "RadixSort"));
+            registrar(resultados, tamano, "TernarySearch",
+                medirTiempo(() -> TernarySearch.ternarySearch(datos, 0, datos.length - 1, objetivo), "TernarySearch"));
 
-            registrar(resultados, tamano, "DualPivotQuickSort",
-                medirTiempo(() -> DualPivotQuickSort.dualPivotQuickSort(copiar(datos), 0, datos.length - 1), "DualPivotQuickSort"));
-
-            registrar(resultados, tamano, "CocktailSort",
-                medirTiempo(() -> CocktailSort.cocktailSort(copiar(datos)), "CocktailSort"));
+            registrar(resultados, tamano, "JumpSearch",
+                medirTiempo(() -> JumpSearch.jumpSearch(datos, objetivo), "JumpSearch"));
         }
 
-        exportarCSV(resultados, "resultados/benchmark_java.csv");
-        exportarJSON(resultados, "resultados/benchmark_java.json");
+        exportarCSV(resultados, "resultados/benchmark_busqueda_java.csv");
+        exportarJSON(resultados, "resultados/benchmark_busqueda_java.json");
 
         System.out.println("\n=== Benchmark completado ===");
         executor.shutdown();
@@ -101,7 +99,7 @@ public class BenchmarkJava {
 
     static void registrar(List<String[]> resultados, String tamano, String algo, double tiempo) {
         if (tiempo > 0) {
-            String t = String.format(Locale.US, "%.2f", tiempo);
+            String t = String.format(Locale.US, "%.4f", tiempo);
             System.out.println("  " + algo + ": " + t + " ms");
             resultados.add(new String[]{algo, tamano, t, "Java"});
         }

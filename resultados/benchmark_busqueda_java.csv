@@ -1,0 +1,10 @@
+algoritmo,tamano,tiempo_ms,lenguaje
+BinarySearch,10k,0.6938,Java
+TernarySearch,10k,0.7005,Java
+JumpSearch,10k,1.0846,Java
+BinarySearch,100k,0.0059,Java
+TernarySearch,100k,0.0078,Java
+JumpSearch,100k,0.1868,Java
+BinarySearch,1m,0.0063,Java
+TernarySearch,1m,0.0068,Java
+JumpSearch,1m,0.7626,Java

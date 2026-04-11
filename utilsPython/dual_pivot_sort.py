@@ -56,14 +56,10 @@ def partition(arr, low, high):
     # Returning the indices of the pivots
     return j, g
 
-# Driver code
-arr = [ 24, 8, 42, 75, 29, 77, 38, 57 ]
-dualPivotQuickSort(arr, 0, 7)
-
-print('Sorted array: ', end = '')
-for i in arr:
-    print(i, end = ' ')
-    
-print()
-    
-# This code is contributed by Gourish Sadhu
+if __name__ == "__main__":
+    arr = [24, 8, 42, 75, 29, 77, 38, 57]
+    dualPivotQuickSort(arr, 0, len(arr) - 1)
+    print('Sorted array: ', end='')
+    for i in arr:
+        print(i, end=' ')
+    print()

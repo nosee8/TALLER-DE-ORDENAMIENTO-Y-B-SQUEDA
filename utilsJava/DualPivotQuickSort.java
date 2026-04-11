@@ -1,8 +1,10 @@
+package utilsJava;
+
 /**
  * Dual Pivot QuickSort Implementation
  * Referencia: https://www.geeksforgeeks.org/dual-pivot-quicksort/
  */
-public class DualPivotsSort {
+public class DualPivotQuickSort {
 
     static void swap(int[] arr, int i, int j) {
         int temp = arr[i];
@@ -41,21 +43,12 @@ public class DualPivotsSort {
         return new int[]{j, g};
     }
 
-    static void dualPivotQuickSort(int[] arr, int low, int high) {
+    public static void dualPivotQuickSort(int[] arr, int low, int high) {
         if (low < high) {
             int[] piv = partition(arr, low, high);
             dualPivotQuickSort(arr, low, piv[0] - 1);
             dualPivotQuickSort(arr, piv[0] + 1, piv[1] - 1);
             dualPivotQuickSort(arr, piv[1] + 1, high);
         }
-    }
-
-    public static void main(String[] args) {
-        int[] arr = {24, 8, 42, 75, 29, 77, 38, 57};
-        dualPivotQuickSort(arr, 0, arr.length - 1);
-        
-        System.out.print("Sorted array: ");
-        for (int i = 0; i < arr.length; i++)
-            System.out.print(arr[i] + " ");
     }
 }

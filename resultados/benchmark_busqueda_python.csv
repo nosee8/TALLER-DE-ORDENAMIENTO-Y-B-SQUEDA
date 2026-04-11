@@ -1,0 +1,10 @@
+algoritmo,tamano,tiempo_ms,lenguaje
+BinarySearch,10k,0.0163,Python
+TernarySearch,10k,0.0202,Python
+JumpSearch,10k,0.0374,Python
+BinarySearch,100k,0.0257,Python
+TernarySearch,100k,0.0232,Python
+JumpSearch,100k,0.1777,Python
+BinarySearch,1m,0.0244,Python
+TernarySearch,1m,0.0283,Python
+JumpSearch,1m,0.3148,Python

@@ -26,8 +26,9 @@ def cocktailSort(a):
                 swapped = True
         start = start+1
 
-a = [5, 1, 4, 2, 8, 0, 2]
-cocktailSort(a)
-print("Sorted array is:")
-for i in range(len(a)):
-    print ("%d" %a[i]),
+if __name__ == "__main__":
+    a = [5, 1, 4, 2, 8, 0, 2]
+    cocktailSort(a)
+    print("Sorted array is:")
+    for i in range(len(a)):
+        print("%d" % a[i], end=" ")

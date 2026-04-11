@@ -57,14 +57,8 @@ def radixSort(arr):
         exp *= 10
 
 
-# Driver code
-arr = [170, 45, 75, 90, 802, 24, 2, 66]
-
-# Function Call
-radixSort(arr)
-
-for i in range(len(arr)):
-    print(arr[i], end=" ")
-
-# This code is contributed by Mohit Kumra
-# Edited by Patrick Gallagher
+if __name__ == "__main__":
+    arr = [170, 45, 75, 90, 802, 24, 2, 66]
+    radixSort(arr)
+    for i in range(len(arr)):
+        print(arr[i], end=" ")

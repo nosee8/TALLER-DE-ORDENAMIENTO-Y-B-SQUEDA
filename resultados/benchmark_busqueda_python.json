@@ -1,0 +1,56 @@
+[
+  {
+    "algoritmo": "BinarySearch",
+    "tamano": "10k",
+    "tiempo_ms": 0.0163,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "TernarySearch",
+    "tamano": "10k",
+    "tiempo_ms": 0.0202,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "JumpSearch",
+    "tamano": "10k",
+    "tiempo_ms": 0.0374,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "BinarySearch",
+    "tamano": "100k",
+    "tiempo_ms": 0.0257,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "TernarySearch",
+    "tamano": "100k",
+    "tiempo_ms": 0.0232,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "JumpSearch",
+    "tamano": "100k",
+    "tiempo_ms": 0.1777,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "BinarySearch",
+    "tamano": "1m",
+    "tiempo_ms": 0.0244,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "TernarySearch",
+    "tamano": "1m",
+    "tiempo_ms": 0.0283,
+    "lenguaje": "Python"
+  },
+  {
+    "algoritmo": "JumpSearch",
+    "tamano": "1m",
+    "tiempo_ms": 0.3148,
+    "lenguaje": "Python"
+  }
+]
