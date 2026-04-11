@@ -110,7 +110,350 @@ Los algoritmos evaluados son:
 
 ---
 
-## Estructura del proyecto
+## Punto 3 — Análisis de Casos Específicos
+
+El objetivo de este punto es diferente a los anteriores. No se mide el tiempo experimentalmente: se **calcula analíticamente** cuántas operaciones ejecuta cada algoritmo en función del tamaño de la entrada `n`. A ese cálculo se le llama `T(n)`, y de él se deriva la notación Big-O.
+
+### Cómo se lee el cálculo de T(n)
+
+Cada línea de código tiene un costo. El principio es contar cuántas veces se ejecuta cada instrucción:
+
+- Una asignación simple (`int x = 0`) cuesta **1** sin importar el valor.
+- Una condición de ciclo `i < n` se evalúa **n + 1** veces si el ciclo corre n iteraciones: n veces que da verdadero y 1 vez que da falso y sale.
+- El incremento `i++` se ejecuta exactamente **n veces** (una por cada iteración que sí ocurre).
+- Una instrucción **dentro** del ciclo se ejecuta **n veces** si el ciclo corre n iteraciones.
+- Si hay un ciclo dentro de otro, el tiempo total del ciclo interno se **multiplica** por las iteraciones del externo.
+
+Al final se suman todos los costos, se simplifica la expresión, y la potencia más alta de `n` determina la clase de complejidad.
+
+---
+
+### Algoritmo 1 — Ordenar lista enlazada de 0s, 1s y 2s
+
+**Fuente:** https://www.geeksforgeeks.org/sort-a-linked-list-of-0s-1s-or-2s/
+
+#### Qué problema resuelve
+
+Se tiene una lista enlazada cuyos nodos contienen únicamente los valores 0, 1 o 2 en cualquier orden. El objetivo es dejarla ordenada: todos los 0s primero, luego los 1s, luego los 2s.
+
+#### Cómo funciona el algoritmo
+
+La solución es un algoritmo de **dos pasadas** sobre la lista:
+
+**Primera pasada — contar:**
+Se recorre la lista completa de principio a fin. Por cada nodo se mira su valor (0, 1 o 2) y se incrementa el contador correspondiente en un arreglo `cnt` de tres posiciones. Al terminar, `cnt[0]` dice cuántos ceros hay, `cnt[1]` cuántos unos y `cnt[2]` cuántos doses.
+
+**Segunda pasada — sobreescribir:**
+Se vuelve a recorrer la lista desde el principio. Se usa una variable `idx` que empieza en 0. Por cada nodo se escribe el valor `idx` en él. Cuando `cnt[idx]` llega a cero, significa que ya se colocaron todos los valores de ese tipo, y se avanza `idx` al siguiente (0 → 1 → 2). Se repite hasta recorrer todos los nodos.
+
+> El punto clave es que **no se mueven los nodos** de lugar. Solo se sobreescriben los valores dentro de ellos. La lista mantiene su estructura física exacta, y la ordenación se logra mediante escritura directa guiada por los conteos.
+
+**Ejemplo paso a paso con la lista:** `1 → 1 → 2 → 1 → 0`
+
+Primera pasada:
+- Nodo con 1: `cnt = [0, 1, 0]`
+- Nodo con 1: `cnt = [0, 2, 0]`
+- Nodo con 2: `cnt = [0, 2, 1]`
+- Nodo con 1: `cnt = [0, 3, 1]`
+- Nodo con 0: `cnt = [1, 3, 1]`
+
+Segunda pasada con `idx = 0`:
+- `cnt[0] = 1` → escribir 0 en el primer nodo. `cnt = [0, 3, 1]`
+- `cnt[0] = 0` → avanzar `idx = 1`
+- `cnt[1] = 3` → escribir 1, escribir 1, escribir 1. `cnt = [0, 0, 1]`
+- `cnt[1] = 0` → avanzar `idx = 2`
+- `cnt[2] = 1` → escribir 2. `cnt = [0, 0, 0]`
+
+Resultado: `0 → 1 → 1 → 1 → 2`
+
+#### Cálculo de T(n) — donde n = número de nodos en la lista
+
+```
+sortList(Node head):
+
+int[] cnt = {0, 0, 0}              -- 3   (tres asignaciones, una por cada posición)
+Node ptr = head                    -- 1
+
+--- While 1 (primera pasada: contar) ---
+
+Condición ptr != null              -- n + 1
+    (el ciclo tiene n iteraciones: n veces verdadero, 1 vez falso al salir)
+
+    cnt[ptr.data] += 1             -- n   (una vez por cada nodo)
+    ptr = ptr.next                 -- n   (una vez por cada nodo)
+
+Subtotal While 1 = (n+1) + n + n = 3n + 1
+
+--- Después del ciclo 1 ---
+
+int idx = 0                        -- 1
+ptr = head                         -- 1
+
+--- While 2 (segunda pasada: sobreescribir) ---
+
+Condición ptr != null              -- n + 1
+    (ptr avanza exactamente n veces, una por cada nodo)
+
+    if (cnt[idx] == 0)             -- n   (se evalúa en cada iteración)
+    idx += 1                       -- 2   (idx solo puede ir 0→1 y 1→2, máximo 2 veces)
+    ptr.data = idx                 -- n   (se ejecuta cuando el else es verdadero, n veces en total)
+    cnt[idx] -= 1                  -- n
+    ptr = ptr.next                 -- n
+
+Subtotal While 2 = (n+1) + n + 2 + n + n + n = 5n + 3
+
+--- Suma total ---
+
+T(n) = 3 + 1 + (3n + 1) + 1 + 1 + (5n + 3)
+T(n) = 8n + 10
+```
+
+**Por qué `idx += 1` cuesta solo 2 y no n:**
+En el ciclo, cada iteración hace UNA de dos cosas: o avanza `ptr` (rama `else`) o incrementa `idx` (rama `if`). `ptr` avanza n veces en total porque la lista tiene n nodos. `idx` solo puede cambiar de 0 a 1 y de 1 a 2, máximo dos cambios, independientemente de cuán grande sea n. Eso lo hace un costo constante.
+
+**T(n) = 8n + 10 → O(n)**
+
+---
+
+### Algoritmo 2 — Ordenar arreglo según el orden de otro arreglo (Relative Sort)
+
+**Fuente:** https://www.geeksforgeeks.org/sort-array-according-order-defined-another-array/
+
+#### Qué problema resuelve
+
+Se tienen dos arreglos: `a1` es el arreglo principal a ordenar, y `a2` es un arreglo de referencia que define el orden deseado. El resultado debe ser que los elementos de `a1` que aparecen en `a2` queden ordenados según la posición en que aparecen en `a2`, y los elementos de `a1` que no aparecen en `a2` se ubiquen al final en orden ascendente.
+
+**Ejemplo:**
+- `a1 = [2, 1, 2, 3, 4]`
+- `a2 = [2, 1, 2]` (el 2 aparece dos veces en a2, lo que indica que debe ir primero y dos veces)
+- Resultado: `[2, 2, 1, 3, 4]`
+  - El 2 aparece dos veces en a2, entonces se colocan todos los 2s de a1 primero.
+  - El 1 aparece en a2, entonces va después.
+  - El 3 y 4 no están en a2, van al final ordenados ascendentemente.
+
+#### Cómo funciona el algoritmo
+
+**Paso 1 — Contar frecuencias:**
+Se recorre `a1` completamente y se usa un `HashMap` para registrar cuántas veces aparece cada número. Si `a1 = [2, 1, 2, 3, 4]`, el mapa queda `{2→2, 1→1, 3→1, 4→1}`.
+
+**Paso 2 — Colocar los elementos de a2 en orden:**
+Se recorre `a2`. Por cada elemento que aparece en el mapa, se copia al inicio de `a1` tantas veces como su frecuencia indique y luego se elimina del mapa. Esto garantiza que el orden de `a2` se respete exactamente.
+
+**Paso 3 — Recolectar y ordenar los sobrantes:**
+Los elementos que quedaron en el mapa (los que no estaban en `a2`) se recolectan en una lista auxiliar `remaining`, se ordenan con `Collections.sort` y se añaden al final de `a1`.
+
+> El `HashMap` es la pieza central: permite saber en tiempo constante cuántas veces aparece cada elemento, evitando búsquedas lineales repetidas.
+
+#### Cálculo de T(n) — donde n = tamaño de `a1`, m = tamaño de `a2`
+
+```
+relativeSort(int[] a1, int[] a2):
+
+int m = a1.length                  -- 1
+int n = a2.length                  -- 1
+Map freq = new HashMap<>()         -- 1
+
+--- For 1 (contar frecuencias de a1) ---
+
+i = 0                              -- 1
+i < n  (usando n = a1.length)     -- n + 1
+i++                                -- n
+freq.put(a1[i], ...)              -- n
+    (cada put en HashMap es O(1) amortizado)
+
+Subtotal For 1 = 1 + (n+1) + n + n = 3n + 3
+
+int index = 0                      -- 1
+
+--- For 2 (colocar elementos de a2, m iteraciones externas) ---
+
+i = 0                              -- 1
+i < m                              -- m + 1
+i++                                -- m
+freq.remove(a2[i])                -- m
+
+    --- While interno ---
+    (en total, el while coloca exactamente los elementos de a1 que están en a2)
+    (sea c el número de esos elementos: c ≤ n)
+
+    freq.getOrDefault(...) > 0    -- c + m
+        (c veces verdadero, m veces falso: una salida por iteración externa)
+    a1[index++] = a2[i]          -- c
+    freq.put(a2[i], ...)         -- c
+
+Subtotal For 2 = 1 + (m+1) + m + m + (c+m) + c + c = 3c + 4m + 2
+
+--- Recolectar sobrantes (r = n - c elementos que no estaban en a2) ---
+
+List remaining = new ArrayList<>() -- 1
+for (entry : freq.entrySet())      -- r + 1   (r verdaderos + 1 falso al salir)
+    remaining.add(entry.getKey())  -- r
+
+Subtotal collect = 2r + 2
+
+--- Ordenar sobrantes ---
+
+Collections.sort(remaining)        -- r·log(r)
+    (usa TimSort internamente, complejidad O(r log r))
+
+--- Añadir sobrantes al final de a1 ---
+
+for (num : remaining)              -- r + 1
+    a1[index++] = num             -- r
+
+Subtotal append = 2r + 1
+
+--- Suma total ---
+
+T(n, m) = (1+1+1) + (3n+3) + 1 + (3c+4m+2) + (2r+2) + r·log(r) + (2r+1)
+T(n, m) = 3n + 4m + r·log(r) + 4r + 3c + 11
+```
+
+Dado que `c + r = n` (todo elemento de a1 es colocado o es sobrante), podemos reemplazar `c = n - r`:
+
+```
+T(n, m) = 3n + 4m + r·log(r) + 4r + 3(n - r) + 11
+T(n, m) = 6n + 4m + r·log(r) + r + 11
+```
+
+**Análisis por casos:**
+
+**Peor caso** (r = n): ningún elemento de `a1` aparece en `a2`. El paso de colocar no hace nada útil, y todos los elementos de `a1` caen en `remaining`. El sort domina:
+```
+T(n) = 6n + 4m + n·log(n) + n + 11
+T(n) ≈ n·log(n)
+```
+**O(n log n)**
+
+**Mejor caso** (r = 0): todos los elementos de `a1` están en `a2`. No hay sobrantes, no hay sort. Solo el recorrido y la colocación:
+```
+T(n) = 6n + 4m + 0 + 0 + 11
+T(n) ≈ n + m
+```
+**O(n + m)**
+
+---
+
+### Algoritmo 3 — Ordenar arreglo con valores en rango [0, n²-1]
+
+**Fuente:** https://www.geeksforgeeks.org/sort-n-numbers-range-0-n2-1-linear-time/
+
+#### Qué problema resuelve
+
+Se tiene un arreglo de `n` elementos donde cada valor puede estar entre 0 y n²-1 (por ejemplo, si el arreglo tiene 7 elementos, los valores pueden ir de 0 a 48). El objetivo es ordenarlo en tiempo O(n), es decir, más rápido que los algoritmos de comparación tradicionales que son O(n log n).
+
+#### Por qué es posible ordenar más rápido que O(n log n)
+
+Los algoritmos como MergeSort u HeapSort comparan elementos entre sí y por eso tienen un límite teórico de O(n log n). Pero si se conoce el rango de los valores, se puede usar **Counting Sort**, que no compara elementos sino que los cuenta y los recoloca. Counting Sort es O(n + k) donde k es el rango de valores. El problema aquí es que el rango es n², así que un Counting Sort directo sería O(n + n²) = O(n²), que es peor.
+
+La solución es aplicar **Radix Sort en base n**: representar cada número como si tuviera dos "dígitos" en base n. Cualquier número entre 0 y n²-1 puede representarse como `d1 * n + d0` donde `d0 = número % n` y `d1 = número / n`. Cada dígito está en el rango [0, n-1]. Luego se aplica Counting Sort dos veces: una para el dígito menos significativo (`d0`) y otra para el más significativo (`d1`). Cada Counting Sort es O(n), y como se hacen exactamente dos, el total es O(n).
+
+#### Cómo funciona el algoritmo
+
+El método `sort` simplemente llama a `countSort` dos veces:
+- Primera llamada con `exp = 1`: ordena según el dígito menos significativo (`(arr[i] / 1) % n`).
+- Segunda llamada con `exp = n`: ordena según el dígito más significativo (`(arr[i] / n) % n`).
+
+Cada llamada a `countSort` ejecuta cuatro pasos internos:
+
+**Paso 1 — Inicializar el arreglo de conteos a cero:**
+Se crea un arreglo `count` de tamaño `n` con todos sus valores en 0.
+
+**Paso 2 — Contar ocurrencias:**
+Se recorre `arr` y por cada elemento se calcula su "dígito" en la base actual usando `(arr[i] / exp) % n`. Se incrementa `count` en esa posición.
+
+**Paso 3 — Prefijo suma (prefix sum):**
+Se transforma `count` para que cada posición indique no cuántos elementos tienen ese dígito, sino cuántos elementos tienen un dígito menor o igual. Esto convierte los conteos en posiciones finales dentro del arreglo de salida.
+
+**Paso 4 — Construir el arreglo de salida:**
+Se recorre `arr` de atrás hacia adelante. Para cada elemento se consulta su posición final en `count`, se coloca en esa posición en `output` y se decrementa el contador. Recorrer de atrás hacia adelante garantiza que el ordenamiento sea **estable** (los elementos con el mismo dígito mantienen su orden relativo, lo cual es esencial para que el segundo paso del Radix Sort sea correcto).
+
+**Paso 5 — Copiar output de vuelta a arr.**
+
+#### Cálculo de T(n) — análisis de `countSort` primero
+
+```
+countSort(int arr[], int n, int exp):
+
+int output[] = new int[n]          -- n   (crear e inicializar n celdas)
+int i                              -- 1
+int count[] = new int[n]           -- n   (crear e inicializar n celdas)
+
+--- Loop 0 (inicializar count a 0 explícitamente) ---
+
+i = 0                              -- 1
+i < n                              -- n + 1
+i++                                -- n
+count[i] = 0                       -- n
+
+Subtotal Loop 0 = 1 + (n+1) + n + n = 3n + 2
+
+--- Loop 1 (contar ocurrencias) ---
+
+i = 0                              -- 1
+i < n                              -- n + 1
+i++                                -- n
+count[(arr[i]/exp)%n]++           -- n
+
+Subtotal Loop 1 = 3n + 2
+
+--- Loop 2 (prefijo suma) ---
+
+i = 1                              -- 1
+    (el ciclo empieza en 1, no en 0, porque acumula desde el anterior)
+i < n                              -- n
+    (desde i=1 hasta i=n-1: son n-1 iteraciones verdaderas + 1 falsa = n evaluaciones)
+i++                                -- n - 1
+count[i] += count[i-1]            -- n - 1
+
+Subtotal Loop 2 = 1 + n + (n-1) + (n-1) = 3n - 1
+
+--- Loop 3 (construir output, recorre de n-1 hasta 0) ---
+
+i = n - 1                          -- 1
+i >= 0                             -- n + 1
+    (desde i=n-1 hasta i=0: n iteraciones verdaderas + 1 falsa = n+1 evaluaciones)
+i--                                -- n
+output[count[(arr[i]/exp)%n]-1] = arr[i]   -- n
+count[(arr[i]/exp)%n]--           -- n
+
+Subtotal Loop 3 = 1 + (n+1) + n + n + n = 4n + 2
+
+--- Loop 4 (copiar output a arr) ---
+
+i = 0                              -- 1
+i < n                              -- n + 1
+i++                                -- n
+arr[i] = output[i]                -- n
+
+Subtotal Loop 4 = 3n + 2
+
+--- Suma total de countSort ---
+
+T_countSort(n) = (n + 1 + n) + (3n+2) + (3n+2) + (3n-1) + (4n+2) + (3n+2)
+              = (2n+1) + (3n+2) + (3n+2) + (3n-1) + (4n+2) + (3n+2)
+              = (2+3+3+3+4+3)n + (1+2+2-1+2+2)
+T_countSort(n) = 18n + 8
+```
+
+Ahora el método `sort` llama a `countSort` dos veces:
+
+```
+sort(int arr[], int n):
+
+countSort(arr, n, 1)               -- T_countSort(n) = 18n + 8
+countSort(arr, n, n)               -- T_countSort(n) = 18n + 8
+
+T_sort(n) = (18n + 8) + (18n + 8)
+T_sort(n) = 36n + 16
+```
+
+**Por qué el número de llamadas es fijo en 2 y no en log(n):**
+En un Radix Sort genérico se hacen tantas pasadas como dígitos tenga el número más grande. Aquí los valores están acotados a [0, n²-1]. En base n, cualquier número en ese rango tiene **exactamente 2 dígitos** (d1 y d0). Por eso siempre se hacen exactamente 2 llamadas a `countSort`, sin importar cuán grande sea n. Ese "2" es una constante que desaparece en la notación Big-O.
+
+**T(n) = 36n + 16 → O(n)**
+
+---
 
 ```
 TALLER-DE-ORDENAMIENTO-Y-B-SQUEDA/
