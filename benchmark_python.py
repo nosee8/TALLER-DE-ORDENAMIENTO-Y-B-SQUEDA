@@ -40,11 +40,14 @@ def medir_tiempo(func, arr, algo_nombre):
     result = [None]
     error = [None]
     done = [False]
-    
+
     def run_algorithm():
         try:
             arr_copy = copiar_lista(arr)
-            
+
+            # start DESPUÉS de copiar: medimos solo el algoritmo
+            start = time.perf_counter()
+
             # Algunos algoritmos necesitan parámetros adicionales
             if algo_nombre == 'MergeSort':
                 func(arr_copy, 0, len(arr_copy) - 1)
@@ -52,16 +55,14 @@ def medir_tiempo(func, arr, algo_nombre):
                 func(arr_copy, 0, len(arr_copy) - 1)
             else:
                 func(arr_copy)
-            
+
             end = time.perf_counter()
             result[0] = (end - start) * 1000  # milisegundos
         except Exception as e:
             error[0] = e
         finally:
             done[0] = True
-    
-    start = time.perf_counter()
-    
+
     # Ejecutar en un hilo separado con timeout
     thread = threading.Thread(target=run_algorithm)
     thread.daemon = True

@@ -36,33 +36,106 @@ Los algoritmos evaluados son:
 
 1. **Generación única de datos:** Los números aleatorios de 8 dígitos se generan una sola vez y se guardan en archivos de texto (`data_10k.txt`, `data_100k.txt`, `data_1m.txt`). En ejecuciones posteriores, el programa lee desde esos archivos sin regenerarlos. Esto garantiza que todos los algoritmos se evalúan con exactamente el mismo conjunto de datos, haciendo la comparación válida.
 
-2. **Medición aislada:** El tiempo se mide únicamente alrededor de la ejecución del algoritmo, utilizando `System.nanoTime()` en Java y `time.perf_counter()` en Python. No se incluye el tiempo de lectura de archivos ni de copia del arreglo.
+2. **Medición aislada:** El tiempo se mide únicamente alrededor de la ejecución del algoritmo. En Java se usa `System.nanoTime()` dentro del hilo de medición. En Python se usa `time.perf_counter()` iniciado **después** de copiar el arreglo y **antes** de llamar al algoritmo. No se incluye el tiempo de lectura de archivos ni de copia del arreglo.
 
 3. **Copia del arreglo antes de cada prueba:** Antes de ejecutar cada algoritmo se hace una copia del arreglo original. Sin esto, el segundo algoritmo recibiría datos ya ordenados y sus tiempos serían artificialmente bajos.
 
-4. **Exportación de resultados:** Los tiempos se almacenan y exportan en formato CSV y JSON para su análisis, y se genera un gráfico de barras comparativo con los valores visibles sobre cada barra.
+4. **Warmup de la JVM:** El benchmark Java ejecuta tres pasadas de calentamiento sobre un arreglo de 5.000 elementos con todos los algoritmos antes de iniciar la medición real. Esto fuerza la compilación JIT del bytecode a código nativo, garantizando que los tiempos medidos reflejen el rendimiento sostenido de la JVM y no el costo de compilación de la primera ejecución.
+
+5. **Exportación de resultados:** Los tiempos se almacenan y exportan en formato CSV y JSON para su análisis, y se genera un gráfico de barras comparativo con los valores visibles sobre cada barra.
 
 ### Resultados obtenidos
 
 | Algoritmo | Java 10k | Java 100k | Java 1M | Python 10k | Python 100k | Python 1M |
 |---|---|---|---|---|---|---|
-| HeapSort | 6.30 ms | 26.14 ms | 333.59 ms | 54.53 ms | 658.75 ms | 26,127 ms |
-| MergeSort | 4.71 ms | 28.05 ms | 281.36 ms | 40.86 ms | 502.44 ms | 18,355 ms |
-| RadixSort | 5.87 ms | 22.51 ms | 115.20 ms | 31.12 ms | 1,018 ms | 24,685 ms |
-| DualPivotQuickSort | 4.72 ms | 16.17 ms | 177.07 ms | 19.90 ms | 621.52 ms | 15,759 ms |
-| CocktailSort | 130.27 ms | 18,605 ms | TIMEOUT | 5,450 ms | TIMEOUT | TIMEOUT |
+| HeapSort | 3.46 ms | 29.63 ms | 323.17 ms | 55.77 ms | 822.69 ms | 30,856 ms |
+| MergeSort | 2.77 ms | 29.35 ms | 507.99 ms | 42.68 ms | 629.54 ms | 21,010 ms |
+| RadixSort | 2.46 ms | 12.07 ms | 153.13 ms | 42.41 ms | 1,252.57 ms | 22,987 ms |
+| DualPivotQuickSort | 1.54 ms | 15.28 ms | 170.43 ms | 22.94 ms | 729.51 ms | 14,700 ms |
+| CocktailSort | 174.09 ms | 20,466 ms | TIMEOUT | 5,787 ms | TIMEOUT | TIMEOUT |
+
+> TIMEOUT = el algoritmo excedió el límite de 5 minutos (300 s). Comportamiento esperado para O(n²) a gran escala.
 
 ### Análisis de resultados
 
-**CocktailSort confirma O(n²):** Al multiplicar el tamaño por 10 (de 10k a 100k), el tiempo en Java pasó de 130 ms a 18.605 ms, un factor de ×143. Matemáticamente O(n²) predice ×100. Que sea mayor indica que el peor caso se activa con mayor frecuencia en datos completamente aleatorios. A 1M de elementos el algoritmo no termina dentro del límite de 5 minutos, lo que confirma que O(n²) es inviable a gran escala.
+#### Ratios de crecimiento observados vs teóricos
 
-**Los algoritmos O(n log n) escalan correctamente:** Al crecer de 10k a 1M (×100 en datos), los tiempos en Java crecieron aproximadamente ×53 para HeapSort, ×60 para MergeSort y ×37 para DualPivotQuickSort. Matemáticamente, O(n log n) a ×100 datos debería crecer alrededor de ×115. El hecho de que los valores sean menores se explica por las optimizaciones del JIT de Java, que compila el código caliente en instrucciones nativas durante la ejecución.
+Para validar la complejidad, se compara cuánto crece el tiempo cuando el tamaño se multiplica por 10.
 
-**RadixSort — el más rápido en Java a 1M, pero no en Python:** En Java lidera con 115 ms porque su complejidad O(nk) con k=8 dígitos fijos funciona en la práctica como O(n). Sin embargo, en Python es el más lento a 1M con 24.685 ms, porque hace muchas operaciones de memoria (arreglos auxiliares, conteo de dígitos) y Python paga overhead por cada acceso a lista con tipado dinámico. Esto demuestra que el algoritmo teóricamente más eficiente no siempre gana en todos los contextos de ejecución.
+**O(n log n) predice:** ×12,5 al pasar de 10k a 100k, ×12 al pasar de 100k a 1M.  
+**O(nk) predice:** ×10 en ambos saltos (k es constante = 8 dígitos).  
+**O(n²) predice:** ×100 en ambos saltos.
 
-**DualPivotQuickSort — el más consistente:** Es el más rápido o segundo más rápido en casi todas las combinaciones. Su ventaja es la localidad de caché: opera in-place sin arreglos auxiliares y sus dos pivotes reducen las comparaciones promedio respecto al QuickSort clásico.
+| Algoritmo | Java 100k→1M | Predicho | Java 10k→100k | Predicho |
+|---|---|---|---|---|
+| HeapSort | ×10.9 | ×12 ✓ | ×8.6 | ×12.5 |
+| MergeSort | ×17.3 | ×12 ⚠ | ×10.6 | ×12.5 ✓ |
+| DualPivotQuickSort | ×11.2 | ×12 ✓ | ×9.9 | ×12.5 ✓ |
+| RadixSort | ×12.7 | ×10 ✓ | ×4.9 | ×10 ⚠ |
+| CocktailSort | TIMEOUT | ×100 | ×117.6 | ×100 ✓ |
 
-**Java vs Python:** El mismo algoritmo sobre el mismo arreglo muestra que Java es entre 65 y 214 veces más rápido que Python dependiendo del algoritmo. La razón es que Python interpreta cada instrucción en tiempo de ejecución con tipado dinámico, mientras que Java compila a bytecode y el JIT lo convierte a instrucciones nativas optimizadas para el procesador.
+| Algoritmo | Python 100k→1M | Predicho | Python 10k→100k | Predicho |
+|---|---|---|---|---|
+| HeapSort | ×37.5 | ×12 ⚠ | ×14.8 | ×12.5 |
+| MergeSort | ×33.4 | ×12 ⚠ | ×14.8 | ×12.5 |
+| DualPivotQuickSort | ×20.2 | ×12 ⚠ | ×31.8 | ×12.5 |
+| RadixSort | ×18.4 | ×10 ⚠ | ×29.5 | ×10 |
+| CocktailSort | TIMEOUT | ×100 | — | ×100 |
+
+---
+
+#### CocktailSort confirma O(n²)
+
+En Java, al multiplicar el tamaño por 10 (de 10k a 100k), el tiempo pasó de 174 ms a 20.466 ms: un factor ×117. La predicción de O(n²) es ×100. La diferencia se debe a que el arreglo es aleatorio, lo que activa el peor caso del algoritmo con mayor frecuencia de la que anticipa el análisis promedio. A 1M de elementos el algoritmo no termina en 5 minutos, confirmando que O(n²) es inviable a gran escala.
+
+En Python, el timeout ocurre ya desde 100k, dado que Python paga un overhead de interpretación por cada intercambio que Java no tiene.
+
+---
+
+#### Java: los ratios 10k→100k son levemente menores de lo esperado
+
+Incluso con warmup, el JIT de la JVM sigue refinando sus optimizaciones durante la ejecución real. El warmup con 5.000 elementos no activa todas las optimizaciones que aplica cuando ve 10.000 o 100.000 elementos en el benchmark real. Por eso los tiempos de 10k resultan algo más bajos de lo que predice la teoría pura, haciendo que el ratio 10k→100k sea inferior al esperado. Los ratios **100k→1M son los más confiables** porque a ese punto el JIT ya compiló todo el código caliente al nivel más alto de optimización (compilador C2 de la JVM).
+
+DualPivotQuickSort es la excepción positiva: su ratio 10k→100k (×9.9) es el más cercano al teórico (×12.5), porque opera completamente in-place y el JIT optimiza sus bucles de partición muy rápido.
+
+---
+
+#### RadixSort Java: crecimiento sublineal de 10k a 100k
+
+RadixSort 10k→100k creció solo ×4.9 cuando la teoría predice ×10. Esto no es un error: el counting sort interno tiene bucles secuenciales muy simples (`count[digit]++`, recorrido lineal del arreglo). El JIT aplica instrucciones SIMD (vectorización) de forma más agresiva cuando el bucle tiene 100.000 iteraciones que cuando tiene 10.000. El resultado es que el código es más eficiente por elemento a 100k que a 10k. En la ventana 100k→1M el ratio es ×12.7, ya cerca del ×10 teórico, porque el JIT ya alcanzó su máximo nivel de optimización desde los 100k.
+
+---
+
+#### Python: crecimiento super-lineal de 100k a 1M
+
+Todos los algoritmos Python muestran ratios mucho mayores de lo esperado al pasar de 100k a 1M. La causa es estructural, no de código:
+
+- En Python, cada entero en una lista es un objeto en el heap (~28 bytes de overhead por número).
+- Un arreglo de 1M elementos en Python ocupa ~28 MB en RAM.
+- El mismo arreglo en Java (`int[]`) ocupa solo ~4 MB.
+
+A 1M elementos, el footprint de memoria de Python es 7 veces mayor que el de Java. Esto causa **cache misses severos**: los accesos al arreglo ya no caben en L2 (típicamente 256 KB–2 MB) y cada acceso puede ir a L3 o RAM. Los algoritmos como HeapSort o RadixSort, que acceden al arreglo de forma no secuencial, son especialmente sensibles. El tiempo extra no es del algoritmo, es del sistema de memoria.
+
+RadixSort es el más afectado (×29.5 de 10k a 100k) porque en cada pasada crea un arreglo auxiliar `output` de tamaño n, duplicando el footprint de memoria.
+
+---
+
+#### MergeSort Java a 1M: ratio ×17.3 (mayor al esperado)
+
+MergeSort es el único algoritmo de la lista que requiere O(n) de memoria adicional (el arreglo `output` para el merge). A 1M elementos en Java, esa memoria auxiliar es ~4 MB adicionales. Cuando Java necesita más memoria de la disponible en el heap actual, dispara el **Garbage Collector (GC)**, que pausa la ejecución para liberar memoria. Esa pausa se suma al tiempo medido aunque no es tiempo del algoritmo. El ratio ×17.3 (versus ×12 esperado) refleja una o más pausas de GC durante la medición.
+
+---
+
+#### Java vs Python: ¿cuánto más rápido es Java?
+
+| Algoritmo | Factor Java/Python a 10k | Factor Java/Python a 100k | Factor Java/Python a 1M |
+|---|---|---|---|
+| HeapSort | ×16 | ×28 | ×95 |
+| MergeSort | ×15 | ×21 | ×41 |
+| RadixSort | ×17 | ×104 | ×150 |
+| DualPivotQuickSort | ×15 | ×48 | ×86 |
+
+La ventaja de Java crece con el tamaño del arreglo porque el JIT tiene más oportunidades de optimizar el código caliente, mientras Python paga el overhead de interpretación y cache misses en cada operación adicional. A 1M elementos, RadixSort en Java es 150 veces más rápido que en Python: misma lógica, mismo algoritmo, resultado radicalmente distinto por la capa de ejecución.
 
 ---
 
@@ -76,7 +149,7 @@ Los algoritmos evaluados son:
 
 | Algoritmo | Complejidad |
 |---|---|
-| Búsqueda Binaria | O(log n) |
+| Búsqueda Binaria | O(log₂ n) |
 | Búsqueda Ternaria | O(log₃ n) |
 | Búsqueda por Saltos (Jump Search) | O(√n) |
 
@@ -86,27 +159,92 @@ Los algoritmos evaluados son:
 
 2. **Selección del objetivo:** Se busca el elemento central del arreglo ordenado. Esta elección garantiza que el elemento existe y no favorece ni perjudica a ningún algoritmo (no está al inicio ni al final del arreglo).
 
-3. **Medición aislada:** El tiempo se mide únicamente alrededor de la llamada al algoritmo de búsqueda, con la misma precisión que en el Punto 1.
+3. **Medición con 1.000 repeticiones promediadas:** Cada algoritmo se ejecuta 1.000 veces sobre el mismo arreglo y se reporta el promedio. Los algoritmos de búsqueda terminan en microsegundos: una sola medición es dominada por el ruido del sistema operativo (scheduling, interrupciones). Promediar 1.000 ejecuciones elimina ese ruido y produce tiempos representativos del algoritmo real.
 
-4. **Exportación de resultados:** Los tiempos se exportan en CSV y JSON y se genera un gráfico de barras comparativo.
+4. **Warmup de la JVM:** Igual que en el Punto 1, se ejecutan pasadas de calentamiento antes de iniciar la medición para estabilizar la compilación JIT.
+
+5. **Exportación de resultados:** Los tiempos se exportan en CSV y JSON y se genera un gráfico de barras comparativo.
 
 ### Resultados obtenidos
 
 | Algoritmo | Java 10k | Java 100k | Java 1M | Python 10k | Python 100k | Python 1M |
 |---|---|---|---|---|---|---|
-| BinarySearch | 0.69 ms | 0.006 ms | 0.006 ms | 0.016 ms | 0.026 ms | 0.024 ms |
-| TernarySearch | 0.70 ms | 0.008 ms | 0.007 ms | 0.020 ms | 0.023 ms | 0.028 ms |
-| JumpSearch | 1.08 ms | 0.187 ms | 0.763 ms | 0.037 ms | 0.178 ms | 0.315 ms |
+| BinarySearch | 0.0009 ms | 0.0003 ms | 0.0002 ms | 0.0032 ms | 0.0039 ms | 0.0050 ms |
+| TernarySearch | 0.0013 ms | 0.0002 ms | 0.0002 ms | 0.0045 ms | 0.0059 ms | 0.0057 ms |
+| JumpSearch | 0.0040 ms | 0.0072 ms | 0.0092 ms | 0.0144 ms | 0.0508 ms | 0.1663 ms |
+
+> Todos los tiempos son promedios de 1.000 ejecuciones consecutivas sobre el mismo arreglo.
 
 ### Análisis de resultados
 
-**JVM warmup en Java a 10k:** Los tiempos de Java a 10k son anómalamente altos comparados con 100k y 1M en BinarySearch y TernarySearch. Esto se debe al calentamiento de la JVM: la primera ejecución es más lenta porque el JIT aún no ha compilado ese código. Es un comportamiento real del entorno de ejecución que confirma que los benchmarks con una sola iteración en Java no reflejan el rendimiento sostenido.
+#### JumpSearch confirma O(√n) con precisión
 
-**BinarySearch y TernarySearch son equivalentes en la práctica:** BinarySearch realiza log₂(1.000.000) ≈ 20 comparaciones. TernarySearch realiza log₃(1.000.000) ≈ 13 iteraciones, pero hace 2 comparaciones por iteración, totalizando alrededor de 26. La diferencia matemática es marginal y el overhead de la recursión de TernarySearch cancela su ventaja teórica. BinarySearch es preferible por ser iterativo, más simple y con menor uso del stack.
+O(√n) predice que al multiplicar n por 10, el tiempo crece ×√10 = ×3.16.
 
-**JumpSearch confirma O(√n):** Al crecer el arreglo de 10k a 1M (×100 en datos), el tiempo en Python creció de 0.037 ms a 0.315 ms, un factor de ×8.5. Para O(√n), √100 = 10, por lo que se esperaría ×10. El resultado experimental está muy cerca de la predicción teórica, lo que valida el análisis de complejidad. JumpSearch es útil en sistemas donde el acceso al arreglo tiene un costo fijo (como búsqueda en bloques de disco), pero en memoria RAM pierde siempre contra BinarySearch.
+| Ventana | Python real | Predicho | Error |
+|---|---|---|---|
+| 10k → 100k | ×3.53 | ×3.16 | +11.7% |
+| 100k → 1M | ×3.27 | ×3.16 | +3.5% |
 
-**Java vs Python en búsqueda:** A diferencia del ordenamiento, en búsqueda los tiempos son tan pequeños (microsegundos) que la diferencia entre Java y Python es menos pronunciada. A 1M, Python (0.024 ms) y Java (0.006 ms) ejecutan BinarySearch en tiempos del mismo orden de magnitud, con Java siendo aproximadamente ×4 más rápido. Esto demuestra que para operaciones de muy baja duración, el overhead de Python es menos significativo que en operaciones de larga duración como el ordenamiento.
+Los datos Python replican casi perfectamente la complejidad teórica. Esto valida tanto la implementación del algoritmo como la metodología de medición.
+
+En Java, JumpSearch también crece correctamente (10k < 100k < 1M), pero los ratios son menores que los de Python porque el JIT aplica optimizaciones más agresivas a los bucles del algoritmo cuando tiene más iteraciones (más calor = más optimización), reduciendo el tiempo por elemento a medida que n crece.
+
+---
+
+#### BinarySearch y TernarySearch son O(log n) ≈ casi constante
+
+O(log₂ n) predice que al pasar de 10k a 1M (×100 en datos), el tiempo crece solo ×log₂(1.000.000)/log₂(10.000) = ×1.50.
+
+| Algoritmo | Python 10k→1M real | Predicho |
+|---|---|---|
+| BinarySearch | ×1.56 (0.0032→0.0050 ms) | ×1.50 ✓ |
+| TernarySearch | ×1.27 (0.0045→0.0057 ms) | ×1.50 ✓ |
+
+Los tiempos Python muestran el crecimiento esperado: muy lento, consistente con O(log n). Pasar de buscar en 10.000 a buscar en 1.000.000 elementos agrega apenas 13 comparaciones adicionales (log₂(10k)≈13 vs log₂(1M)≈20).
+
+---
+
+#### Java Binary/Ternary: los tiempos decrecen con n — por qué es esperado
+
+En Java, BinarySearch y TernarySearch muestran tiempos que disminuyen al crecer n (10k: 0.0009 ms, 100k: 0.0003 ms, 1M: 0.0002 ms). Esto parece contradecir O(log n), pero tiene una explicación directa del comportamiento del JIT:
+
+Con 1.000 repeticiones de medición, el total de iteraciones del bucle de búsqueda dentro del hilo es:
+- n=10k: 1.000 × log₂(10.000) ≈ 13.300 iteraciones de bucle
+- n=1M:  1.000 × log₂(1.000.000) ≈ 19.900 iteraciones de bucle
+
+A mayor número de iteraciones del bucle, el compilador JIT C2 de la JVM aplica optimizaciones más agresivas (vectorización SIMD, eliminación de verificaciones de límites). A n=1M, el JIT genera código nativo 3–4× más eficiente por iteración. Como O(log n) crece apenas ×1.5 entre 10k y 1M, pero el JIT mejora ×3–4×, el tiempo observado decrece. Los tiempos de Python, que no tiene JIT, muestran el crecimiento algorítmico puro y son la referencia correcta de O(log n) en este caso.
+
+---
+
+#### BinarySearch vs TernarySearch: cuál es mejor en la práctica
+
+BinarySearch realiza log₂(1.000.000) ≈ 20 comparaciones por búsqueda.  
+TernarySearch realiza log₃(1.000.000) ≈ 13 iteraciones, pero ejecuta **2 comparaciones** por iteración, totalizando ~26 comparaciones.
+
+TernarySearch hace **más trabajo** que BinarySearch en la práctica. Además, la versión aquí implementada es **recursiva**, lo que agrega overhead de llamadas al stack. BinarySearch es iterativo, más simple y siempre más rápido. Los datos lo confirman en Python: TernarySearch es ~40% más lento que BinarySearch a 10k (0.0045 ms vs 0.0032 ms).
+
+---
+
+#### JumpSearch vs BinarySearch: cuándo tiene sentido
+
+JumpSearch es O(√n) vs O(log n) de BinarySearch. Para n=1M:
+- JumpSearch Python: 0.1663 ms
+- BinarySearch Python: 0.0050 ms
+
+BinarySearch es **33 veces más rápido** a 1M elementos. JumpSearch solo tiene sentido cuando el "salto" de bloque en bloque es más barato que el acceso aleatorio (por ejemplo, búsqueda en bloques de disco o cintas magnéticas, donde retroceder es costoso). En RAM, BinarySearch siempre gana.
+
+---
+
+#### Java vs Python en búsqueda
+
+| Algoritmo | Factor Java/Python a 1M |
+|---|---|
+| BinarySearch | ×25 |
+| TernarySearch | ×29 |
+| JumpSearch | ×18 |
+
+La diferencia entre Java y Python es mucho menor que en el ordenamiento (×18–29 vs ×40–150). Esto es coherente: cuando el algoritmo hace muy pocas operaciones (log₂ de 1M = 20 comparaciones), el overhead fijo de inicialización de Python se amortiza poco y su diferencia con Java se reduce. El cuello de botella deja de ser el lenguaje y pasa a ser el propio algoritmo.
 
 ---
 
@@ -455,6 +593,8 @@ En un Radix Sort genérico se hacen tantas pasadas como dígitos tenga el númer
 
 ---
 
+## Estructura del repositorio
+
 ```
 TALLER-DE-ORDENAMIENTO-Y-B-SQUEDA/
 │
@@ -512,10 +652,10 @@ python3 datos/generador_datos.py
 
 ### Punto 1 — Ordenamiento
 ```bash
-# Java
+# Java (incluye warmup JIT automático)
 javac utilsJava/*.java BenchmarkJava.java && java BenchmarkJava
 
-# Python
+# Python (~11 min por los timeouts de CocktailSort en 100k y 1M)
 python3 benchmark_python.py
 
 # Gráfico comparativo
@@ -524,10 +664,10 @@ python3 generar_grafico.py
 
 ### Punto 2 — Búsqueda
 ```bash
-# Java
+# Java (incluye warmup JIT y promedia 1.000 repeticiones)
 javac utilsJava/*.java BenchmarkBusquedaJava.java && java BenchmarkBusquedaJava
 
-# Python
+# Python (promedia 1.000 repeticiones)
 python3 benchmark_busqueda_python.py
 
 # Gráfico comparativo

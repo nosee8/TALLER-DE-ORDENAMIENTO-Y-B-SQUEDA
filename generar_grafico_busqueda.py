@@ -80,21 +80,26 @@ def crear_grafico(df):
             py_time = row[row['lenguaje'] == 'Python']['tiempo_ms'].values
             java_time = row[row['lenguaje'] == 'Java']['tiempo_ms'].values
 
-            tiempos_python.append(py_time[0] if len(py_time) > 0 else 0)
-            tiempos_java.append(java_time[0] if len(java_time) > 0 else 0)
+            # Usar None cuando no hay dato (0 falsearía la escala)
+            tiempos_python.append(float(py_time[0]) if len(py_time) > 0 else None)
+            tiempos_java.append(float(java_time[0]) if len(java_time) > 0 else None)
 
-        bars1 = ax.bar(x - width/2, tiempos_python, width, label='Python',
+        # Reemplazar None con 0 solo para graficar (barra invisible); guardar originales para etiquetas
+        py_plot = [v if v is not None else 0 for v in tiempos_python]
+        java_plot = [v if v is not None else 0 for v in tiempos_java]
+
+        bars1 = ax.bar(x - width/2, py_plot, width, label='Python',
                        color=colores['Python'], edgecolor='black', linewidth=0.5)
-        bars2 = ax.bar(x + width/2, tiempos_java, width, label='Java',
+        bars2 = ax.bar(x + width/2, java_plot, width, label='Java',
                        color=colores['Java'], edgecolor='black', linewidth=0.5)
 
         for bar, val in zip(bars1, tiempos_python):
-            if val > 0:
+            if val is not None and val > 0:
                 ax.text(bar.get_x() + bar.get_width()/2, bar.get_height(),
                         f'{val:.4f}', ha='center', va='bottom', fontsize=8, fontweight='bold')
 
         for bar, val in zip(bars2, tiempos_java):
-            if val > 0:
+            if val is not None and val > 0:
                 ax.text(bar.get_x() + bar.get_width()/2, bar.get_height(),
                         f'{val:.4f}', ha='center', va='bottom', fontsize=8, fontweight='bold')
 
@@ -105,6 +110,11 @@ def crear_grafico(df):
         ax.set_xticklabels(orden_algoritmos, rotation=15, ha='right', fontsize=9)
         ax.legend(loc='upper left', fontsize=9)
         ax.grid(axis='y', alpha=0.3)
+
+        # Escala logarítmica si hay diferencias de más de un orden de magnitud
+        valores_validos = [v for v in tiempos_python + tiempos_java if v is not None and v > 0]
+        if valores_validos and max(valores_validos) / min(valores_validos) > 10:
+            ax.set_yscale('log')
 
     plt.tight_layout()
 

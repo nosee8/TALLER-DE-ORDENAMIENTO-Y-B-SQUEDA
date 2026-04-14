@@ -21,6 +21,7 @@ from ternary_search import ternarySearch
 from jump_search import jumpSearch
 
 TIMEOUT_SECONDS = 60
+REPETICIONES = 1000  # Promediar para reducir ruido (tiempos en microsegundos)
 
 
 def cargar_datos(archivo):
@@ -40,9 +41,10 @@ def medir_tiempo(func, algo_nombre):
     def run_algorithm():
         try:
             start = time.perf_counter()
-            func()
+            for _ in range(REPETICIONES):
+                func()
             end = time.perf_counter()
-            result[0] = (end - start) * 1000  # milisegundos
+            result[0] = (end - start) * 1000 / REPETICIONES  # promedio en ms
         except Exception as e:
             error[0] = e
         finally:

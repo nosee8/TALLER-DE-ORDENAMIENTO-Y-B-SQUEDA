@@ -1,11 +1,11 @@
 [
-  {"algoritmo": "BinarySearch", "tamano": "10k", "tiempo_ms": 0.6938, "lenguaje": "Java"},
-  {"algoritmo": "TernarySearch", "tamano": "10k", "tiempo_ms": 0.7005, "lenguaje": "Java"},
-  {"algoritmo": "JumpSearch", "tamano": "10k", "tiempo_ms": 1.0846, "lenguaje": "Java"},
-  {"algoritmo": "BinarySearch", "tamano": "100k", "tiempo_ms": 0.0059, "lenguaje": "Java"},
-  {"algoritmo": "TernarySearch", "tamano": "100k", "tiempo_ms": 0.0078, "lenguaje": "Java"},
-  {"algoritmo": "JumpSearch", "tamano": "100k", "tiempo_ms": 0.1868, "lenguaje": "Java"},
-  {"algoritmo": "BinarySearch", "tamano": "1m", "tiempo_ms": 0.0063, "lenguaje": "Java"},
-  {"algoritmo": "TernarySearch", "tamano": "1m", "tiempo_ms": 0.0068, "lenguaje": "Java"},
-  {"algoritmo": "JumpSearch", "tamano": "1m", "tiempo_ms": 0.7626, "lenguaje": "Java"}
+  {"algoritmo": "BinarySearch", "tamano": "10k", "tiempo_ms": 0.0009, "lenguaje": "Java"},
+  {"algoritmo": "TernarySearch", "tamano": "10k", "tiempo_ms": 0.0013, "lenguaje": "Java"},
+  {"algoritmo": "JumpSearch", "tamano": "10k", "tiempo_ms": 0.0040, "lenguaje": "Java"},
+  {"algoritmo": "BinarySearch", "tamano": "100k", "tiempo_ms": 0.0003, "lenguaje": "Java"},
+  {"algoritmo": "TernarySearch", "tamano": "100k", "tiempo_ms": 0.0002, "lenguaje": "Java"},
+  {"algoritmo": "JumpSearch", "tamano": "100k", "tiempo_ms": 0.0072, "lenguaje": "Java"},
+  {"algoritmo": "BinarySearch", "tamano": "1m", "tiempo_ms": 0.0002, "lenguaje": "Java"},
+  {"algoritmo": "TernarySearch", "tamano": "1m", "tiempo_ms": 0.0002, "lenguaje": "Java"},
+  {"algoritmo": "JumpSearch", "tamano": "1m", "tiempo_ms": 0.0092, "lenguaje": "Java"}
 ]

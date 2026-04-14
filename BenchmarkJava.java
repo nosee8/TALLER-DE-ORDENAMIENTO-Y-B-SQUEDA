@@ -70,6 +70,19 @@ public class BenchmarkJava {
         List<String[]> resultados = new ArrayList<>();
         resultados.add(new String[]{"algoritmo", "tamano", "tiempo_ms", "lenguaje"});
 
+        // Warmup: forzar compilación JIT antes de medir cualquier tamaño
+        System.out.println("\n[Warmup JIT...]");
+        int[] warmupArr = new int[5000];
+        for (int i = 0; i < warmupArr.length; i++) warmupArr[i] = (int)(Math.random() * 100000);
+        for (int w = 0; w < 3; w++) {
+            HeapSort.heapSort(Arrays.copyOf(warmupArr, warmupArr.length));
+            MergeSort.mergeSort(Arrays.copyOf(warmupArr, warmupArr.length), 0, warmupArr.length - 1);
+            RadixSort.radixSort(Arrays.copyOf(warmupArr, warmupArr.length));
+            DualPivotQuickSort.dualPivotQuickSort(Arrays.copyOf(warmupArr, warmupArr.length), 0, warmupArr.length - 1);
+            CocktailSort.cocktailSort(Arrays.copyOf(warmupArr, warmupArr.length));
+        }
+        System.out.println("[Warmup completado]\n");
+
         for (Map.Entry<String, String> entry : tamanos.entrySet()) {
             String tamano = entry.getKey();
             int[] datos = cargarDatos(entry.getValue());

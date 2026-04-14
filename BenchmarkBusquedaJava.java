@@ -35,11 +35,14 @@ public class BenchmarkBusquedaJava {
         return arr;
     }
 
+    // Repeticiones para promediar y reducir ruido de medición (tiempos en microsegundos)
+    private static final int REPETICIONES = 1000;
+
     static double medirTiempo(Runnable algoritmo, String nombre) {
         Future<Double> future = executor.submit(() -> {
             long start = System.nanoTime();
-            algoritmo.run();
-            return (System.nanoTime() - start) / 1_000_000.0;
+            for (int i = 0; i < REPETICIONES; i++) algoritmo.run();
+            return (System.nanoTime() - start) / 1_000_000.0 / REPETICIONES;
         });
 
         try {
@@ -66,6 +69,18 @@ public class BenchmarkBusquedaJava {
 
         List<String[]> resultados = new ArrayList<>();
         resultados.add(new String[]{"algoritmo", "tamano", "tiempo_ms", "lenguaje"});
+
+        // Warmup: forzar compilación JIT antes de medir cualquier tamaño
+        System.out.println("\n[Warmup JIT...]");
+        int[] warmupArr = new int[1000];
+        for (int i = 0; i < warmupArr.length; i++) warmupArr[i] = i;
+        int warmupTarget = warmupArr[warmupArr.length / 2];
+        for (int w = 0; w < 5; w++) {
+            BinarySearch.binarySearch(warmupArr, warmupTarget);
+            TernarySearch.ternarySearch(warmupArr, 0, warmupArr.length - 1, warmupTarget);
+            JumpSearch.jumpSearch(warmupArr, warmupTarget);
+        }
+        System.out.println("[Warmup completado]\n");
 
         for (Map.Entry<String, String> entry : tamanos.entrySet()) {
             String tamano = entry.getKey();
