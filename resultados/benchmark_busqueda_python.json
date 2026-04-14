@@ -2,55 +2,55 @@
   {
     "algoritmo": "BinarySearch",
     "tamano": "10k",
-    "tiempo_ms": 0.0032,
+    "tiempo_ms": 0.0049,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "TernarySearch",
     "tamano": "10k",
-    "tiempo_ms": 0.0045,
+    "tiempo_ms": 0.0037,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "JumpSearch",
     "tamano": "10k",
-    "tiempo_ms": 0.0144,
+    "tiempo_ms": 0.0346,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "BinarySearch",
     "tamano": "100k",
-    "tiempo_ms": 0.0039,
+    "tiempo_ms": 0.0046,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "TernarySearch",
     "tamano": "100k",
-    "tiempo_ms": 0.0059,
+    "tiempo_ms": 0.0056,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "JumpSearch",
     "tamano": "100k",
-    "tiempo_ms": 0.0508,
+    "tiempo_ms": 0.109,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "BinarySearch",
     "tamano": "1m",
-    "tiempo_ms": 0.005,
+    "tiempo_ms": 0.0082,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "TernarySearch",
     "tamano": "1m",
-    "tiempo_ms": 0.0057,
+    "tiempo_ms": 0.0389,
     "lenguaje": "Python"
   },
   {
     "algoritmo": "JumpSearch",
     "tamano": "1m",
-    "tiempo_ms": 0.1663,
+    "tiempo_ms": 0.8058,
     "lenguaje": "Python"
   }
 ]

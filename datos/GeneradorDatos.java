@@ -1,4 +1,5 @@
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.*;
 import java.util.*;
 
@@ -35,16 +36,16 @@ public class GeneradorDatos {
             carpeta.mkdir();
         }
         
-        int[][] tamanos = {{10000, "data_10k.txt"}, {100000, "data_100k.txt"}, {1000000, "data_1m.txt"}};
-        
-        for (int[] par : tamanos) {
-            String archivo = "datos/" + par[1];
+        int [] tamanos = {10000, 100000, 1000000};
+        String [] archivos = {"data_10k.txt", "data_100k.txt", "data_1m.txt"};
+        for (int i=0; i<tamanos.length; i++) {
+            String archivo = "datos/" + archivos[i];
             File f = new File(archivo);
             if (!f.exists()) {
-                System.out.println("Generando " + par[1] + " (" + par[0] + " elementos)...");
-                generarDatos(par[0], archivo);
+                System.out.println("Generando " + archivos[i] + " (" + tamanos[i] + " elementos)...");
+                generarDatos(tamanos[i], archivo);
             } else {
-                System.out.println(par[1] + " ya existe, omitiendo...");
+                System.out.println(archivos[i] + " ya existe, omitiendo...");
             }
         }
     }
