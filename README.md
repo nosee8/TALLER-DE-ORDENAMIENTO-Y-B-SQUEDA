@@ -363,10 +363,10 @@ Se tienen dos arreglos: `a1` es el arreglo principal a ordenar, y `a2` es un arr
 
 **Ejemplo:**
 - `a1 = [2, 1, 2, 3, 4]`
-- `a2 = [2, 1, 2]` (el 2 aparece dos veces en a2, lo que indica que debe ir primero y dos veces)
+- `a2 = [2, 1, 2]` (define el orden: primero los 2s, luego los 1s; el 2 duplicado no agrega elementos extra)
 - Resultado: `[2, 2, 1, 3, 4]`
-  - El 2 aparece dos veces en a2, entonces se colocan todos los 2s de a1 primero.
-  - El 1 aparece en a2, entonces va después.
+  - El 2 está en a2, entonces todos los 2s de a1 (hay dos) se colocan primero. La cantidad viene de a1, no de cuántas veces aparece en a2.
+  - El 1 está en a2, entonces va después.
   - El 3 y 4 no están en a2, van al final ordenados ascendentemente.
 
 #### Cómo funciona el algoritmo
@@ -387,14 +387,14 @@ Los elementos que quedaron en el mapa (los que no estaban en `a2`) se recolectan
 ```
 relativeSort(int[] a1, int[] a2):
 
-int m = a1.length                  -- 1
-int n = a2.length                  -- 1
+int n = a1.length                  -- 1   (n = tamaño de a1, igual que el encabezado)
+int m = a2.length                  -- 1   (m = tamaño de a2, igual que el encabezado)
 Map freq = new HashMap<>()         -- 1
 
---- For 1 (contar frecuencias de a1) ---
+--- For 1 (contar frecuencias de a1, itera n veces) ---
 
 i = 0                              -- 1
-i < n  (usando n = a1.length)     -- n + 1
+i < n                              -- n + 1
 i++                                -- n
 freq.put(a1[i], ...)              -- n
     (cada put en HashMap es O(1) amortizado)
@@ -444,28 +444,30 @@ Subtotal append = 2r + 1
 --- Suma total ---
 
 T(n, m) = (1+1+1) + (3n+3) + 1 + (3c+4m+2) + (2r+2) + r·log(r) + (2r+1)
-T(n, m) = 3n + 4m + r·log(r) + 4r + 3c + 11
+T(n, m) = 3n + 4m + r·log(r) + 4r + 3c + 12
 ```
+
+> La constante final es 12: 3 + 3 + 1 + 2 + 2 + 1 = 12 (suma de los términos independientes de cada bloque).
 
 Dado que `c + r = n` (todo elemento de a1 es colocado o es sobrante), podemos reemplazar `c = n - r`:
 
 ```
-T(n, m) = 3n + 4m + r·log(r) + 4r + 3(n - r) + 11
-T(n, m) = 6n + 4m + r·log(r) + r + 11
+T(n, m) = 3n + 4m + r·log(r) + 4r + 3(n - r) + 12
+T(n, m) = 6n + 4m + r·log(r) + r + 12
 ```
 
 **Análisis por casos:**
 
 **Peor caso** (r = n): ningún elemento de `a1` aparece en `a2`. El paso de colocar no hace nada útil, y todos los elementos de `a1` caen en `remaining`. El sort domina:
 ```
-T(n) = 6n + 4m + n·log(n) + n + 11
+T(n) = 6n + 4m + n·log(n) + n + 12
 T(n) ≈ n·log(n)
 ```
 **O(n log n)**
 
 **Mejor caso** (r = 0): todos los elementos de `a1` están en `a2`. No hay sobrantes, no hay sort. Solo el recorrido y la colocación:
 ```
-T(n) = 6n + 4m + 0 + 0 + 11
+T(n) = 6n + 4m + 0 + 0 + 12
 T(n) ≈ n + m
 ```
 **O(n + m)**
